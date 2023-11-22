@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using CrashKonijn.Goap.Configs.Interfaces;
 
 namespace CrashKonijn.Goap.Classes.Validators
@@ -30,17 +31,28 @@ namespace CrashKonijn.Goap.Classes.Validators
         
         public static string GetGenericTypeName(this Type type)
         {
-            var typeName = type.Name;
-
-            if (type.IsGenericType)
+            var typeName = new StringBuilder();
+            if (type.IsNested)
             {
-                var genericArguments = type.GetGenericArguments();
-                var genericTypeName = typeName.Substring(0, typeName.IndexOf('`'));
-                var typeArgumentNames = string.Join(",", genericArguments.Select(a => a.Name));
-                typeName = $"{genericTypeName}<{typeArgumentNames}>";
+                typeName.Append(type.DeclaringType.GetGenericTypeName());
+                typeName.Append(".");
             }
 
-            return typeName;
+            var genericLocation = type.Name.IndexOf('`');
+
+            if (genericLocation != -1)
+            {
+                var genericArguments = type.GetGenericArguments();
+                var genericTypeName = type.Name.Substring(0, type.Name.IndexOf('`'));
+                var typeArgumentNames = string.Join(",", genericArguments.Select(a => a.Name));
+                typeName.Append($"{genericTypeName}<{typeArgumentNames}>");
+            }
+            else
+            {
+                typeName.Append(type.Name);
+            }
+
+            return typeName.ToString();
         }
     }
 }
