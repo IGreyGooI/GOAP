@@ -67,6 +67,38 @@ namespace CrashKonijn.Goap.Classes.Builders
             
             return this;
         }
+        
+        public ActionBuilder AddConditionExact<TWorldKey>(int amount)
+            where TWorldKey : IWorldKey
+        {
+            this.conditions.Add(new Condition
+            {
+                WorldKey = this.worldKeyBuilder.GetKey<TWorldKey>(),
+                Comparison = Comparison.GreaterThanOrEqual,
+                Amount = amount,
+            });
+            this.conditions.Add(new Condition
+            {
+                WorldKey = this.worldKeyBuilder.GetKey<TWorldKey>(),
+                Comparison = Comparison.SmallerThanOrEqual,
+                Amount = amount,
+            });
+            
+            return this;
+        }
+
+        public ActionBuilder AddConditionExact<TWorldKey>(bool boolean)
+            where TWorldKey : IWorldKey
+        {
+            this.conditions.Add(new Condition
+            {
+                WorldKey = this.worldKeyBuilder.GetKey<TWorldKey>(),
+                Comparison = boolean ? Comparison.GreaterThanOrEqual : Comparison.SmallerThan,
+                Amount = 1,
+            });
+
+            return this;
+        }
 
         [Obsolete("Use `AddEffect<TWorldKey>(EffectType type)` instead.")]
         public ActionBuilder AddEffect<TWorldKey>(bool increase)
@@ -90,6 +122,18 @@ namespace CrashKonijn.Goap.Classes.Builders
                 Increase = type == EffectType.Increase
             });
             
+            return this;
+        }
+
+        public ActionBuilder AddEffectExact<TWorldKey>(bool boolean)
+            where TWorldKey : IWorldKey
+        {
+            this.effects.Add(new Effect
+            {
+                WorldKey = this.worldKeyBuilder.GetKey<TWorldKey>(),
+                Increase = boolean,
+            });
+
             return this;
         }
 
